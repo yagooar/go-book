@@ -513,10 +513,11 @@ Look at this simple program from `Effective Go`_.
     import(
         "os"
         "fmt"
+        "io"
     )
 
     // Contents returns the file's contents as a string.
-    func Contents(filename string) (string, os.Error) {
+    func Contents(filename string) (string, error) {
         f, err := os.Open(filename)
         if err != nil {
             return "", err
@@ -529,7 +530,7 @@ Look at this simple program from `Effective Go`_.
             n, err := f.Read(buf[0:])
             result = append(result, buf[0:n]...) // append is discussed later.
             if err != nil {
-                if err == os.EOF {
+                if err == io.EOF {
                     break
                 }
                 return "", err  // f will be closed if we return here.
@@ -560,8 +561,8 @@ file. And we make a buffer ``buf`` of 100 bytes that will be used to read 100
 bytes at a time from our file using the call to ``f.Read``. This buffer will be
 appended to``result``  each time it's filled with ``f.Read``.
 
-And we loop. If we get an error while reading, we check if its ``os.EOF`` (EOF
-means End Of File) if so, we ``break`` from the loop, else it's another error so
+And we loop. If we get an error while reading, we check if it's ``io.EOF`` (EOF
+means End Of File). If so, we ``break`` from the loop, else it's another error so
 we return an empty string and that error.
 
 At the end, we return the slice ``result`` converted to a string, using a type
@@ -569,7 +570,7 @@ casting and ``nil`` which means that there was no error while retrieving the
 contents of the file.
 
 I know, this example may look a little bit hard, especially since we have never used
-the ``os`` package before, but the main goal of it is to show you a use of the
+the ``os`` and ``io`` packages before, but the main goal of it is to show you a use of the
 ``defer`` statement. And how it can be used to guarantee two things:
 
 - Using ``defer f.Close()`` in the beginning makes sure that you will never
